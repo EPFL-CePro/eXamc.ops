@@ -1,0 +1,73 @@
+- hosts: app
+  become: true
+
+  # Load vars directly; paths are anchored to this playbook's folder
+  vars_files:
+    - "{{ playbook_dir }}/../group_vars/{{ env }}/app.yml"
+    - "{{ playbook_dir }}/../group_vars/{{ env }}/vault.yml"
+
+  vars:
+#    repo_url: "git@github.com:EPFL-CePro/eXamc.git"
+    repo_version: "main"
+    app_dir: "/opt/examc"
+    env_path: "{{ app_dir }}/.env.{{ env }}"
+
+  tasks:
+    - name: Debug app_dir/env
+      ansible.builtin.debug:
+        msg:
+          - "env = {{ env | default('UNSET') }}"
+          - "app_dir = {{ app_dir | default('UNSET') }}"
+          - "env_path = {{ env_path | default('UNSET') }}"
+          - "playbook_dir = {{ playbook_dir | default('UNSET') }}"
+
+    - name: Ensure app dir exists
+      ansible.builtin.file:
+        path: "{{ app_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Checkout application repository
+      ansible.builtin.git:
+        repo: "{{ repo_url }}"
+        dest: "{{ app_dir }}"
+        version: "{{ repo_version }}"
+        force: true
+      when: not ansible_check_mode
+
+    - name: Render remote .env
+      ansible.builtin.template:
+        src: "../templates/.env.j2"
+        dest: "{{ env_path }}"
+        owner: root
+        group: root
+        mode: "0600"
+      no_log: true
+
+    - name: Show available profiles
+      ansible.builtin.shell: |
+        COMPOSE_PROFILES={{ compose_profiles | default('') }} \
+        docker compose -f {{ app_dir }}/compose/{{ compose_file }} \
+          config --profiles
+      args: { chdir: "{{ app_dir }}" }
+      register: profiles_out
+
+    - debug:
+        msg:
+          - "env={{ env }} compose_profiles='{{ compose_profiles | default('') }}'"
+          - "{{ profiles_out.stdout }}"
+
+    - name: Compose up (uses env_file inside compose)
+      ansible.builtin.shell: |
+        COMPOSE_PROFILES={{ compose_profiles | default('') }} \
+        docker compose -f {{ app_dir }}/compose/{{ compose_file }} --env-file .env.{{ env }} \
+          up -d --pull always --force-recreate --remove-orphans
+      args:
+        chdir: "{{ app_dir }}"
+      register: compose_result
+      when: not ansible_check_mode
+
+    - name: Show compose up result
+      ansible.builtin.debug:
+        msg: "{{ compose_result.stderr_lines }}"
+      when: not ansible_check_mode and compose_result is not skipped

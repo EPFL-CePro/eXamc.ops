@@ -1,0 +1,40 @@
+repo_url: "git@github.com:EPFL-CePro/eXamc.git" # SSH is used for dev env to allow for git push using SSH key
+#repo_version: "staging"
+
+env_name: "dev"
+app_dir: "/opt/examc"
+compose_profiles: "mysql-dockerized"
+compose_file: "dev.yml"
+compose_project_name: "examc"
+
+debug: true
+secure_ssl_redirect: false
+session_cookie_secure: false
+csrf_cookie_secure: false
+
+allowed_hosts:
+  - "localhost"
+  - "127.0.0.1"
+  - "0.0.0.0"
+
+csrf_trusted_origins:
+  - "http://localhost"
+  - "http://127.0.0.1"
+  - "http://0.0.0.0"
+  - "http://localhost:8000"
+  - "http://127.0.0.1:8000"
+
+tz: "Europe/Zurich"
+private_media_root: "/private_media"
+
+db_host: "mysql"
+db_port: 3306
+
+celery_broker_url: "redis://redis:6379/0"
+celery_result_backend: "redis://redis:6379/0"
+celery_task_always_eager: true
+
+constance_redis_connection: "redis://redis:6379/0"
+
+django_cache_url: "redis://redis:6379/1"
+django_maintenance_cache_url: "redis://redis:6379/2"

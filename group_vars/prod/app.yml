@@ -1,0 +1,42 @@
+repo_url: "https://github.com/EPFL-CePro/eXamc.git"
+repo_version: "main"
+
+env_name: "prod"
+app_dir: "/opt/examc"
+compose_profiles: "mysql-dockerized"
+compose_file: "prod.yml"
+compose_project_name: "examc"
+
+# Set image tags
+# fe_artifacts_image_tag: "stable"
+# django_image_tag: "stable"
+
+debug: false
+secure_ssl_redirect: true
+session_cookie_secure: true
+csrf_cookie_secure: true
+
+allowed_hosts:
+  - "examc.epfl.ch"
+  - "10.95.34.130"
+  - "localhost"
+  - "127.0.0.1"
+
+csrf_trusted_origins:
+  - "https://examc.epfl.ch"
+  - "https://10.95.34.130"
+
+tz: "Europe/Zurich"
+private_media_root: "/private_media"
+
+db_host: "mysql"
+db_port: 3306
+
+celery_broker_url: "redis://redis:6379/0"
+celery_result_backend: "redis://redis:6379/0"
+celery_task_always_eager: false
+
+constance_redis_connection: "redis://redis:6379/0"
+
+django_cache_url: "redis://redis:6379/1"
+django_maintenance_cache_url: "redis://redis:6379/2"
