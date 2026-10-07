@@ -6,8 +6,6 @@ It replaces manual `.env.*` editing while keeping `.env.example` (in the main eX
 > [!NOTE]
 > For the general project setup (Docker, Makefile, OIDC, DB, etc.), see the `README.md` of the [main eXamc repository](https://github.com/EPFL-CePro/eXamc).
 
----
-
 ## Overview
 
 - 🔐 **Secrets** are stored encrypted with **Ansible Vault**.
@@ -17,7 +15,6 @@ It replaces manual `.env.*` editing while keeping `.env.example` (in the main eX
 
 The manual approach (copying `.env.example`, described in the *Environment files* section of the `README.md` in the [main eXamc repository](https://github.com/EPFL-CePro/eXamc)) remains available; Ansible is the **preferred** workflow. The generated `.env.*` files must contain the same variables listed there, including the Entra ID / OIDC settings.
 
----
 
 ## Configuration files
 
@@ -29,7 +26,6 @@ The manual approach (copying `.env.example`, described in the *Environment files
 | Inventory                     | `inventory/<env>/hosts.ini`  |
 | Deployment playbook           | `playbook.yml`               |
 
----
 
 ## Local development
 
@@ -48,7 +44,6 @@ make up ENV=dev
 > If `.env.dev` is missing, `make up` will prompt you to run `make env` first.  
 > Real `.env.*` files remain **untracked** (ignored by Git). Keep `.env.example` for reference.
 
----
 
 ## Deployment
 
