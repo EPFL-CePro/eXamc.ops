@@ -74,4 +74,4 @@ The playbook (`playbook.yml`):
 3. Runs `docker compose up -d --build` on the target host.
 
 > [!IMPORTANT]
-> Migrations are **not** applied automatically at boot on staging/prod — see the *Migrations & updates* section of the `README.md` in the [main eXamc repository](https://github.com/EPFL-CePro/eXamc).
+> [Django migrations](https://docs.djangoproject.com/en/stable/topics/migrations/) are **not** applied automatically at boot on staging/prod — see the *Migrations & updates* section of the `README.md` in the [main eXamc repository](https://github.com/EPFL-CePro/eXamc).
