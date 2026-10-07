@@ -8,12 +8,6 @@ It replaces manual `.env.*` editing while keeping `.env.example` (in the main eX
 
 ---
 
-## Table of Contents
-
-[TOC]
-
----
-
 ## Overview
 
 - 🔐 **Secrets** are stored encrypted with **Ansible Vault**.
