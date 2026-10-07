@@ -1,4 +1,6 @@
-# eXamc — Ansible + Vault environment management
+# eXamc.ops
+
+Ansible + Vault environment management
 
 This project uses **Ansible** to manage all environment configuration and deployment of [eXamc](https://github.com/EPFL-CePro/eXamc) securely.  
 It replaces manual `.env.*` editing while keeping `.env.example` (in the main eXamc repository) as a public reference.
