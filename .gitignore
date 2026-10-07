@@ -3,3 +3,5 @@
 
 # Retry files generated for failed Ansible playbook runs
 *.retry
+
+.env.*
