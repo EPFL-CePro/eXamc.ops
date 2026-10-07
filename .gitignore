@@ -5,3 +5,6 @@
 *.retry
 
 .env.*
+
+# IDE files
+.idea
