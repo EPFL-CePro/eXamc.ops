@@ -3,11 +3,10 @@
 
   # Load vars directly; paths are anchored to this playbook's folder
   vars_files:
-    - "{{ playbook_dir }}/../group_vars/{{ env }}/app.yml"
-    - "{{ playbook_dir }}/../group_vars/{{ env }}/vault.yml"
+    - "{{ playbook_dir }}/group_vars/{{ env }}/app.yml"
+    - "{{ playbook_dir }}/group_vars/{{ env }}/vault.yml"
 
   vars:
-#    repo_url: "git@github.com:EPFL-CePro/eXamc.git"
     repo_version: "main"
     app_dir: "/opt/examc"
     env_path: "{{ app_dir }}/.env.{{ env }}"
@@ -44,18 +43,22 @@
         mode: "0600"
       no_log: true
 
-    - name: Show available profiles
+    - name: Get available Docker Compose profiles
       ansible.builtin.shell: |
         COMPOSE_PROFILES={{ compose_profiles | default('') }} \
         docker compose -f {{ app_dir }}/compose/{{ compose_file }} \
           config --profiles
-      args: { chdir: "{{ app_dir }}" }
+      args:
+        chdir: "{{ app_dir }}"
       register: profiles_out
 
-    - debug:
+    - name: Show used env and Docker Compose profiles
+      ansible.builtin.debug:
         msg:
-          - "env={{ env }} compose_profiles='{{ compose_profiles | default('') }}'"
-          - "{{ profiles_out.stdout }}"
+          - "env: {{ env }}"
+          - "compose_profiles: {{ compose_profiles | default('') }}"
+          - "Available compose profile: {{ profiles_out.stdout }}"
+
 
     - name: Compose up (uses env_file inside compose)
       ansible.builtin.shell: |
