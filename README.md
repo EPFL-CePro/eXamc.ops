@@ -73,7 +73,7 @@ The playbook (`playbook.yml`):
 
 1. Renders `.env` from `templates/.env.j2`,
 2. Decrypts Vault values,
-3. Runs `docker compose up -d --build` on the target host.
-
+3. Runs `docker compose up -d --force-recreate --remove-orphans` on the target host. It uses the [packages available in the eXamc repository](https://github.com/orgs/EPFL-CePro/packages?repo_name=eXamc).
+4. 
 > [!IMPORTANT]
 > [Django migrations](https://docs.djangoproject.com/en/stable/topics/migrations/) are **not** applied automatically at boot on staging/prod — see the *Migrations & updates* section of the `README.md` in the [main eXamc repository](https://github.com/EPFL-CePro/eXamc).
