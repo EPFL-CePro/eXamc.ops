@@ -1,0 +1,3 @@
+user default off resetpass -@all
+user healthcheck on >healthcheck -@all +ping
+user examc on >{{ vault_secrets.redis_password }} ~* &* +@all
