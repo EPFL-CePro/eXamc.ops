@@ -1,0 +1,24 @@
+# Application code and the .env read by Compose.
+
+- name: Ensure app dir exists
+  ansible.builtin.file:
+    path: "{{ app_dir }}"
+    state: directory
+    mode: "0755"
+
+# Never in dev: app_dir is your working copy, and force: true would discard local changes
+- name: Checkout application repository
+  ansible.builtin.git:
+    repo: "{{ repo_url }}"
+    dest: "{{ app_dir }}"
+    version: "{{ repo_version }}"
+    force: true
+  when: not ansible_check_mode and env != "dev"
+
+- name: Render .env
+  ansible.builtin.template:
+    src: .env.j2
+    dest: "{{ env_path }}"
+    owner: "{{ omit if env == 'dev' else 'root' }}"
+    group: "{{ omit if env == 'dev' else 'root' }}"
+    mode: "0600"

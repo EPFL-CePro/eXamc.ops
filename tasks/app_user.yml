@@ -1,0 +1,35 @@
+# App user and private_media. On servers only: dev uses your own user.
+
+- name: App group (fixed ID, same as GID in the containers)
+  ansible.builtin.group:
+    name: "{{ app_user }}"
+    gid: "{{ app_gid | default(app_uid) }}"
+    system: true
+  when: env != "dev"
+
+- name: App user (no login)
+  ansible.builtin.user:
+    name: "{{ app_user }}"
+    uid: "{{ app_uid }}"
+    group: "{{ app_user }}"
+    system: true
+    create_home: false
+    shell: /usr/sbin/nologin
+  when: env != "dev"
+
+- name: private_media directory
+  ansible.builtin.file:
+    path: "{{ media_dir }}"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: "0700"
+
+# Contents too: files moved in from elsewhere keep their old owner/group
+- name: private_media contents owned by the app user
+  ansible.builtin.file:
+    path: "{{ media_dir }}"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    recurse: true

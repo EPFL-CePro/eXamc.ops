@@ -12,96 +12,20 @@
     app_dir: "/opt/examc"
     env_path: "{{ app_dir }}/.env.{{ env }}"
 
-    app_user: examc       # owns private_media and the secrets; Django runs as it
+    app_user: examc # owns private_media; Django runs as it
     app_uid: 1500
     media_dir: /srv/examc/private_media
     secrets_dir: /srv/examc/secrets
 
   tasks:
-    - name: App user (no login)
-      ansible.builtin.user:
-        name: "{{ app_user }}"
-        uid: "{{ app_uid }}"
-        system: true
-        create_home: false
-        shell: /usr/sbin/nologin
-      when: env != "dev"
+    - name: App user and private_media
+      ansible.builtin.import_tasks: tasks/app_user.yml
 
-    - name: App directories
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: directory
-        owner: "{{ app_user }}"
-        group: "{{ app_user }}"
-        mode: "0700"
-      loop: ["{{ media_dir }}", "{{ secrets_dir }}"]
-      
-    # Files are 0444 because Redis/MySQL run as another user (65532);
-    # the 0700 directory keeps other host users out.
-    - name: Secret files from the vault
-      ansible.builtin.copy:
-        dest: "{{ secrets_dir }}/{{ item }}"
-        content: "{{ vault_secrets[item] }}"
-        mode: "0444"
-      loop: "{{ vault_secrets.keys() | list }}"
-      diff: false # never print file contents, even with --diff
+    - name: Secrets and TLS certificate
+      ansible.builtin.import_tasks: tasks/secrets.yml
 
-    - name: Redis ACL
-      ansible.builtin.template:
-        src: "../templates/redis_acl.j2"
-        dest: "{{ secrets_dir }}/redis_acl"
-        mode: "0444"
-      diff: false
+    - name: Code and .env
+      ansible.builtin.import_tasks: tasks/code.yml
 
-    - name: Ensure app dir exists
-      ansible.builtin.file:
-        path: "{{ app_dir }}"
-        state: directory
-        mode: "0755"
-
-    # Never in dev: app_dir is your working copy, and force: true would discard local changes
-    - name: Checkout application repository
-      ansible.builtin.git:
-        repo: "{{ repo_url }}"
-        dest: "{{ app_dir }}"
-        version: "{{ repo_version }}"
-        force: true
-      when: not ansible_check_mode and env != "dev"
-
-    - name: Render remote .env
-      ansible.builtin.template:
-        src: "../templates/.env.j2"
-        dest: "{{ env_path }}"
-        owner: "{{ omit if env == 'dev' else 'root' }}"
-        group: "{{ omit if env == 'dev' else 'root' }}"
-        mode: "0600"
-
-    - name: Log in to Docker Hardened Images
-      ansible.builtin.command:
-        cmd: docker login dhi.io --username "{{ vault_dockerhub_username }}" --password-stdin
-        stdin: "{{ vault_dockerhub_token }}"
-      no_log: true
-      changed_when: false
-
-    - name: Build the compose command
-      ansible.builtin.set_fact:
-        compose_up_cmd: >-
-          docker compose -f {{ app_dir }}/compose/{{ compose_file }} --env-file {{ env_path }}
-          up -d {{ '--build' if env == 'dev' else '--pull always' }}
-          --force-recreate --remove-orphans --wait --wait-timeout 300
-
-    - name: Show the compose command
-      ansible.builtin.debug:
-        msg: "{{ compose_up_cmd }}"
-
-    - name: Compose up
-      ansible.builtin.command:
-        cmd: "{{ compose_up_cmd }}"
-        chdir: "{{ app_dir }}"
-      register: compose_result
-      when: not ansible_check_mode
-
-    - name: Show compose up result
-      ansible.builtin.debug:
-        msg: "{{ compose_result.stderr_lines }}"
-      when: not ansible_check_mode and compose_result is not skipped
+    - name: Docker Compose stack
+      ansible.builtin.import_tasks: tasks/docker.yml
