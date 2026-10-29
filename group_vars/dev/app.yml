@@ -14,7 +14,5 @@ site_hosts:
 caddy_port: 8443
 caddy_tls_mode: "internal"
 
-mysql_database: "examc"
-
 debug: true
 celery_task_always_eager: true

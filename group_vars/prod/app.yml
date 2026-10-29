@@ -11,5 +11,3 @@ django_image_tag: "stable"
 site_hosts:
   - "examc.epfl.ch"
 caddy_tls_mode: "certs"
-
-mysql_database: "examc"
