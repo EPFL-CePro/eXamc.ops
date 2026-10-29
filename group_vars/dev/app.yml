@@ -1,4 +1,3 @@
-env_name: "dev"
 app_user: "{{ lookup('env', 'USER') }}"
 app_dir: "{{ lookup('env', 'HOME') }}/Documents/Projets/eXamc"
 compose_file: "compose.dev.yml"

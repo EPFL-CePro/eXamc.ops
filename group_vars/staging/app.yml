@@ -1,6 +1,5 @@
 repo_version: "staging"
 
-env_name: "staging"
 compose_file: "compose.prod.yml"      # compose.prod.yml is also used for staging
 
 # Images built by CI for this branch

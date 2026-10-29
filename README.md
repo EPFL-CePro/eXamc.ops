@@ -64,16 +64,16 @@ ansible-vault edit group_vars/<env>/vault.yml --vault-id @prompt
 Always start with a dry run. It shows what would change, without changing anything (secret contents are never printed):
 
 ```bash
-ansible-playbook playbook.yml -i inventory/<env>/hosts.ini --check --diff --vault-id @prompt
+ansible-playbook playbook.yml -i inventory/<env>/hosts.ini -e env=<env> --check --diff --vault-id @prompt
 ```
 
 Then the real run:
 
 | Target             | Command                                                                           |
 |--------------------|-----------------------------------------------------------------------------------|
-| dev (your machine) | `ansible-playbook playbook.yml -i inventory/dev/hosts.ini --vault-id @prompt`     |
-| staging            | `ansible-playbook playbook.yml -i inventory/staging/hosts.ini --vault-id @prompt` |
-| prod               | `ansible-playbook playbook.yml -i inventory/prod/hosts.ini --vault-id @prompt`    |
+| dev (your machine) | `ansible-playbook playbook.yml -i inventory/dev/hosts.ini -e env=dev --vault-id @prompt`     |
+| staging            | `ansible-playbook playbook.yml -i inventory/staging/hosts.ini -e env=staging --vault-id @prompt` |
+| prod               | `ansible-playbook playbook.yml -i inventory/prod/hosts.ini -e env=prod --vault-id @prompt`    |
 
 Each inventory sets `env` (`dev`, `staging` or `prod`), which selects the matching `group_vars/<env>/`. On staging and prod, Ansible connects over SSH as `root`; dev runs locally as you.
 

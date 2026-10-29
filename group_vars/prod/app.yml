@@ -1,11 +1,10 @@
 repo_version: "main"
 
-env_name: "prod"
 compose_file: "compose.prod.yml"
 
 # Images built by CI for releases
-fe_artifacts_image_tag: "stable"
 django_image_tag: "stable"
+fe_artifacts_image_tag: "stable"
 
 # Every name/IP the app answers on
 site_hosts:
