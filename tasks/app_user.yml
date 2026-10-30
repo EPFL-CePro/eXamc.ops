@@ -17,19 +17,22 @@
     shell: /usr/sbin/nologin
   when: env != "dev"
 
+# In dev, the folder belongs to whoever runs the playbook
 - name: private_media directory
   ansible.builtin.file:
     path: "{{ media_dir }}"
     state: directory
-    owner: "{{ app_user }}"
-    group: "{{ app_user }}"
+    owner: "{{ omit if env == 'dev' else app_user }}"
+    group: "{{ omit if env == 'dev' else app_user }}"
     mode: "0700"
 
-# Contents too: files moved in from elsewhere keep their old owner/group
+# Only files that don't already belong to the app user: fast on a large tree, and reports what it changed
 - name: private_media contents owned by the app user
-  ansible.builtin.file:
-    path: "{{ media_dir }}"
-    state: directory
-    owner: "{{ app_user }}"
-    group: "{{ app_user }}"
-    recurse: true
+  ansible.builtin.command:
+    cmd: >-
+      find {{ media_dir | quote }}
+      ( ! -user {{ app_user }} -o ! -group {{ app_user }} )
+      -print -exec chown {{ app_user }}:{{ app_user }} {} +
+  register: media_chown
+  changed_when: media_chown.stdout | length > 0
+  when: env != "dev"

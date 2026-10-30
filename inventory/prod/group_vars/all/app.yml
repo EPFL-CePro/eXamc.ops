@@ -1,0 +1,23 @@
+env: "prod"
+
+app_user: examc     # owns private_media; Django runs as it
+app_uid: 1500       # must match the UID the images are built with
+
+repo_branch: "main"
+
+app_dir: /opt/examc
+media_dir: /srv/examc/private_media
+secrets_dir: /srv/examc/secrets
+
+compose_file: "compose.prod.yml"
+
+# Images built by CI for releases
+django_image_tag: "stable"
+fe_artifacts_image_tag: "stable"
+
+# Use the certificates in ansible vault
+caddy_tls_mode: "certs"
+
+# Every name/IP the app answers on
+site_hosts:
+  - "examc.epfl.ch"

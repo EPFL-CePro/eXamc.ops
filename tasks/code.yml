@@ -1,24 +1,38 @@
 # Application code and the .env read by Compose.
 
+- name: Is the app dir already a Git checkout?
+  ansible.builtin.stat:
+    path: "{{ app_dir }}/.git"
+  register: app_repo
+
 - name: Ensure app dir exists
   ansible.builtin.file:
     path: "{{ app_dir }}"
     state: directory
     mode: "0755"
 
-# Never in dev: app_dir is your working copy, and force: true would discard local changes
+# Servers: always the deployed version, local changes discarded
 - name: Checkout application repository
   ansible.builtin.git:
     repo: "{{ repo_url }}"
     dest: "{{ app_dir }}"
-    version: "{{ repo_version }}"
+    version: "{{ repo_branch }}"
     force: true
   when: not ansible_check_mode and env != "dev"
 
-- name: Render .env
-  ansible.builtin.template:
-    src: .env.j2
-    dest: "{{ env_path }}"
-    owner: "{{ omit if env == 'dev' else 'root' }}"
-    group: "{{ omit if env == 'dev' else 'root' }}"
-    mode: "0600"
+# Dev, first run: clone into the chosen folder
+- name: Clone the repository (dev, folder not yet a checkout)
+  ansible.builtin.git:
+    repo: "{{ repo_url }}"
+    dest: "{{ app_dir }}"
+    version: "{{ repo_branch }}"
+  when: not ansible_check_mode and env == "dev" and not app_repo.stat.exists
+
+# Dev, existing checkout: switch branch without force; git refuses if local changes would be lost
+- name: Switch your checkout to the branch (dev)
+  ansible.builtin.shell:
+    cmd: git fetch --quiet origin && git switch {{ repo_branch | quote }}
+    chdir: "{{ app_dir }}"
+  register: dev_switch
+  changed_when: "'Switched to' in dev_switch.stderr"
+  when: not ansible_check_mode and env == "dev" and app_repo.stat.exists

@@ -1,22 +1,22 @@
-
 - hosts: app
   # dev runs as you: files owned by you, docker login stored for you
   become: "{{ env != 'dev' }}"
 
-  # Load vars directly; paths are anchored to this playbook's folder
-  vars_files:
-    - "{{ playbook_dir }}/group_vars/{{ env }}/app.yml"
-    - "{{ playbook_dir }}/group_vars/{{ env }}/vault.yml"
-
+  # Same in every environment. Paths that differ per environment are in inventory/<env>/group_vars/all/app.yml
   vars:
     repo_url: "https://github.com/EPFL-CePro/eXamc.git"
-    app_dir: "/opt/examc"
     env_path: "{{ app_dir }}/.env.{{ env }}"
 
-    app_user: examc # owns private_media; Django runs as it
-    app_uid: 1500
-    media_dir: /srv/examc/private_media
-    secrets_dir: /srv/examc/secrets
+  pre_tasks:
+    - name: Stop if the environment's variables weren't loaded
+      ansible.builtin.assert:
+        that:
+          - env is defined
+          - app_dir is defined
+          - media_dir is defined
+          - secrets_dir is defined
+        fail_msg: "Variables not loaded: check inventory/<env>/group_vars/all/app.yml."
+        quiet: true
 
   tasks:
     - name: App user and private_media

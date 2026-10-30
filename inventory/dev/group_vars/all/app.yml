@@ -1,17 +1,23 @@
+env: "dev"
+
 app_user: "{{ lookup('env', 'USER') }}"
-app_dir: "{{ lookup('env', 'HOME') }}/Documents/Projets/eXamc"
-compose_file: "compose.dev.yml"
+
+repo_branch: "{{ branch }}"
 
 # Your own user and repo-local folders (instead of the servers' examc user, /etc, /srv)
+app_dir: "{{ checkout | expanduser }}"
 app_uid: 1000
 secrets_dir: "{{ app_dir }}/compose/secrets"
 media_dir: "{{ app_dir }}/compose/data/private_media"
 
-# Caddy on https://localhost:8443 with its internal certificate
-site_hosts:
-  - "localhost"
-caddy_port: 8443
-caddy_tls_mode: "internal"
+compose_file: "compose.dev.yml"
 
 debug: true
 celery_task_always_eager: true
+
+# Caddy generates internal certificate for dev
+caddy_tls_mode: "internal"
+
+# Every name/IP the app answers on
+site_hosts:
+  - "localhost"

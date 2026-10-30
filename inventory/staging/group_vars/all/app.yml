@@ -1,0 +1,24 @@
+env: "staging"
+
+app_user: examc     # owns private_media; Django runs as it
+app_uid: 1500       # must match the UID the images are built with
+
+repo_branch: "staging"
+
+app_dir: /opt/examc
+media_dir: /srv/examc/private_media
+secrets_dir: /srv/examc/secrets
+
+compose_file: "compose.prod.yml" # compose.prod.yml is also used for staging
+
+# Images built by CI for this branch
+django_image_tag: "staging"
+fe_artifacts_image_tag: "staging"
+
+# Caddy generates internal certificate for staging
+caddy_tls_mode: "internal"
+
+# Every name/IP the app answers on
+site_hosts:
+  - "examc-staging.epfl.ch"
+
