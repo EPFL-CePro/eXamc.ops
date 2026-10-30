@@ -114,14 +114,13 @@ Then the real run:
 | staging            | `ansible-playbook playbook.yml -i inventory/staging --vault-id @prompt`                                                      |
 | prod               | `ansible-playbook playbook.yml -i inventory/prod --vault-id @prompt`                                                         |
 
-No `-e env=…`: the inventory's `app.yml` sets it. In dev, `branch` and `checkout` are required: without them, the playbook stops at once and shows the command. Staging and prod always deploy their own `repo_branch` and ignore both.
 
 On staging and prod, Ansible connects over SSH as `root` and the play runs with `become`; dev runs locally as you.
 
 To check what an environment loads, without running anything:
 
 ```bash
-ansible-inventory -i inventory/<env> --graph                         # the hosts must be under @app
+ansible-inventory -i inventory/<env> --graph # the hosts must be under @app
 ansible-inventory -i inventory/<env> --vault-id @prompt --list | jq '._meta.hostvars[] | {env, app_dir, media_dir, secrets_dir}'
 ```
 
