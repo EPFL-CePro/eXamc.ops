@@ -76,6 +76,8 @@ vault_secrets:            # one file per key in SECRETS_DIR
   oidc_rp_client_id: "..."
   oidc_rp_client_secret: "..."
   tenant_id: "..."
+  epfl_api_username: "..."
+  epfl_api_password: "..."
   oasis_base_url: "..."
   oasis_bearer: "..."
   tls_crt: |              # prod: certificate + intermediates; staging/dev: placeholder
